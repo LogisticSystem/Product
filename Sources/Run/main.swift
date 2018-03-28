@@ -11,11 +11,7 @@ do {
 
     try App.configure(&config, &env, &services)
 
-    let app = try Application(
-        config: config,
-        environment: env,
-        services: services
-    )
+    let app = try Application(config: config, environment: env, services: services)
 
     try App.boot(app)
 
