@@ -16,8 +16,27 @@ extension ProductsService {
         }
     }
     
+    func get(_ productId: String) -> Product? {
+        let products = self.products.get()
+        guard let productIndex = products.index(where: { $0.id == productId}) else { return nil }
+        
+        return products[productIndex]
+    }
+    
     func getAll() -> [Product] {
         return self.products.get()
+    }
+    
+    func changeOwner(_ ownerId: String?, forProduct productId: String) -> Product? {
+        var product: Product? = nil
+        self.products.syncSet { products in
+            guard let productIndex = products.index(where: { $0.id == productId }) else { return }
+            
+            product = products[productIndex]
+            product?.ownerId = ownerId
+        }
+        
+        return product
     }
 }
 

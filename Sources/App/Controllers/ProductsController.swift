@@ -27,6 +27,27 @@ extension ProductsController {
         let productsService = try request.make(ProductsService.self)
         return productsService.getAll()
     }
+    
+    func changeOwnerHandler(_ request: Request) throws -> Product {
+        let productId = try request.parameter(String.self)
+        let ownerId = try request.parameter(String.self)
+        
+        let productsService = try request.make(ProductsService.self)
+        guard let product = productsService.changeOwner(ownerId, forProduct: productId) else { throw Abort(.badRequest) }
+        
+        return product
+    }
+    
+    func deleteOwnerHandler(_ request: Request) throws -> Product {
+        let productId = try request.parameter(String.self)
+        let ownerId = try request.parameter(String.self)
+        
+        let productsService = try request.make(ProductsService.self)
+        guard let tmpOwnerId = productsService.get(productId)?.ownerId, tmpOwnerId == ownerId else { throw Abort(.badRequest) }
+        guard let product = productsService.changeOwner(nil, forProduct: productId) else { throw Abort(.badRequest) }
+        
+        return product
+    }
 }
 
 
@@ -38,5 +59,7 @@ extension ProductsController: RouteCollection {
         let productsController = router.grouped("products")
         productsController.get("new", use: createProductHandler)
         productsController.get(use: getAllHandler)
+        productsController.post(String.parameter, "owner", String.parameter, use: changeOwnerHandler)
+        productsController.delete(String.parameter, "owner", String.parameter, use: deleteOwnerHandler)
     }
 }
