@@ -36,28 +36,17 @@ extension ProductsService {
         }
     }
     
-    func changeOwner(_ ownerId: String?, forProduct productId: String) -> Product? {
-        var product: Product? = nil
-        self.products.syncSet { products in
-            guard let productIndex = products.index(where: { $0.id == productId }) else { return }
-            
-            product = products[productIndex]
-            product?.ownerId = ownerId
-        }
-        
-        return product
-    }
-    
-    func changeOwner(_ ownerId: String?, forProducts productsIds: [String]) -> [Product] {
+    func changeOwner(_ ownerId: String?, forProducts products: [Product]) -> [Product] {
         var changedProducts: [Product] = []
-        self.products.syncSet { products in
-            for productId in productsIds {
-                guard let productIndex = products.index(where: { $0.id == productId }) else { continue }
+        self.products.syncSet { tmpProducts in
+            for product in products {
+                guard let productIndex = tmpProducts.index(where: { $0.id == product.id }) else { continue }
                 
-                let product = products[productIndex]
-                product.ownerId = ownerId
+                let tmpProduct = tmpProducts[productIndex]
+                tmpProduct.route = product.route
+                tmpProduct.ownerId = ownerId
                 
-                changedProducts.append(product)
+                changedProducts.append(tmpProduct)
             }
         }
         

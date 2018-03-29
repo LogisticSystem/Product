@@ -57,32 +57,12 @@ extension ProductsController {
         }
     }
     
-    func changeOwnerHandler(_ request: Request) throws -> Product {
-        let productId = try request.parameter(String.self)
-        let ownerId = try request.parameter(String.self)
-        
-        let productsService = try request.make(ProductsService.self)
-        guard let product = productsService.changeOwner(ownerId, forProduct: productId) else { throw Abort(.badRequest) }
-        
-        return product
-    }
-    
-    func deleteOwnerHandler(_ request: Request) throws -> Product {
-        let productId = try request.parameter(String.self)
-        
-        let productsService = try request.make(ProductsService.self)
-        guard let product = productsService.changeOwner(nil, forProduct: productId) else { throw Abort(.badRequest) }
-        
-        return product
-    }
-    
     func multipleChangeOwnerHandler(_ request: Request) throws -> Future<MultipleProducts> {
         return try request.content.decode(MultipleProducts.self).map(to: MultipleProducts.self) { multipleProducts in
             let productsService = try request.make(ProductsService.self)
             
             let ownerId = try request.parameter(String.self)
-            let productsIds = multipleProducts.products.map { $0.id }
-            let products = productsService.changeOwner(ownerId, forProducts: productsIds)
+            let products = productsService.changeOwner(ownerId, forProducts: multipleProducts.products)
             
             return MultipleProducts(products: products)
         }
@@ -91,9 +71,7 @@ extension ProductsController {
     func multipleDeleteOwnerHandler(_ request: Request) throws -> Future<MultipleProducts> {
         return try request.content.decode(MultipleProducts.self).map(to: MultipleProducts.self) { multipleProducts in
             let productsService = try request.make(ProductsService.self)
-            
-            let productsIds = multipleProducts.products.map { $0.id }
-            let products = productsService.changeOwner(nil, forProducts: productsIds)
+            let products = productsService.changeOwner(nil, forProducts: multipleProducts.products)
             
             return MultipleProducts(products: products)
         }
@@ -110,8 +88,6 @@ extension ProductsController: RouteCollection {
         productsController.put(use: configureHandler)
         productsController.get(use: getAllHandler)
         productsController.get("new", use: createProductHandler)
-        productsController.put(String.parameter, "owner", String.parameter, use: changeOwnerHandler)
-        productsController.put(String.parameter, "owner", use: deleteOwnerHandler)
         productsController.put("owner", String.parameter, use: multipleChangeOwnerHandler)
         productsController.put("owner", use: multipleDeleteOwnerHandler)
     }
