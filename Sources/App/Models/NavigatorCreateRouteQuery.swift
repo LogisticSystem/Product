@@ -1,4 +1,5 @@
-struct RouteQuery: Decodable {
+struct NavigatorCreateRouteQuery: Decodable {
+    
     var source: String?
     var destination: String?
 }

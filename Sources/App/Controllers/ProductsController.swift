@@ -8,8 +8,24 @@ struct ProductsController { }
 extension ProductsController {
     
     func createProductHandler(_ request: Request) throws -> Future<Product> {
-        return try request.make(Client.self).get("http://localhost:8080/navigator/route").flatMap(to: Product.self) { response in
-            return try response.content.decode(RouteInfo.self).map(to: Product.self) { routeInfo in
+        var urlComponents = URLComponents(string: "http://localhost:8080/navigator/route")
+        
+        let query = try request.query.decode(ProductsCreateProductQuery.self)
+        var queryItems: [URLQueryItem] = []
+        if let source = query.source {
+            let sourceQueryItem = URLQueryItem(name: "source", value: source)
+            queryItems.append(sourceQueryItem)
+        }
+        if let destination = query.destination {
+            let destinationQueryItem = URLQueryItem(name: "destination", value: destination)
+            queryItems.append(destinationQueryItem)
+        }
+        
+        urlComponents?.queryItems = queryItems.isEmpty ? nil : queryItems
+        guard let url = urlComponents?.string else { throw Abort(.badRequest) }
+        
+        return try request.make(Client.self).get(url).flatMap(to: Product.self) { response in
+            return try response.content.decode(NavigatorRouteInfo.self).map(to: Product.self) { routeInfo in
                 guard let source = routeInfo.storages.first else { throw Abort(.badRequest) }
                 guard let destination = routeInfo.storages.last else { throw Abort(.badRequest) }
                 

@@ -14,7 +14,7 @@ final class Navigator {
     
     private let nodes: [String : StorageNode]
     
-    init(storages: Storages) {
+    init(storages: StoragesConfiguration) {
         var nodes: [String : StorageNode] = [:]
         for storage in storages.storages {
             let storageNode = StorageNode(name: storage)

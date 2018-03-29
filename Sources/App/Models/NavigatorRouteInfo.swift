@@ -1,6 +1,6 @@
 import Vapor
 
-final class RouteInfo: Codable {
+final class NavigatorRouteInfo: Codable {
     
     let storages: [String]
     
@@ -12,4 +12,4 @@ final class RouteInfo: Codable {
 
 // MARK: - Content
 
-extension RouteInfo: Content { }
+extension NavigatorRouteInfo: Content { }

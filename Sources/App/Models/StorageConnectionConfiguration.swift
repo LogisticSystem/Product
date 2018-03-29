@@ -1,6 +1,6 @@
 import Vapor
 
-final class StorageConnection: Codable {
+final class StorageConnectionConfiguration: Codable {
     
     let name: String
     let weight: Int
@@ -14,4 +14,4 @@ final class StorageConnection: Codable {
 
 // MARK: - Content
 
-extension StorageConnection: Content { }
+extension StorageConnectionConfiguration: Content { }

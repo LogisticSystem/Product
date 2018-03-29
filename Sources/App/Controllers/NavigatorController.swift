@@ -10,23 +10,23 @@ struct NavigatorController {
 
 extension NavigatorController {
     
-    func loadConfigsHandler(_ request: Request) throws -> Future<Storages> {
-        return try request.make(Client.self).get(self.storagesUrl).flatMap(to: Storages.self) { response in
-            return try response.content.decode(Storages.self)
+    func loadConfigsHandler(_ request: Request) throws -> Future<StoragesConfiguration> {
+        return try request.make(Client.self).get(self.storagesUrl).flatMap(to: StoragesConfiguration.self) { response in
+            return try response.content.decode(StoragesConfiguration.self)
         }
     }
     
-    func createRouteHandler(_ request: Request) throws -> Future<RouteInfo> {
-        return try loadConfigsHandler(request).map(to: RouteInfo.self) { storages in
+    func createRouteHandler(_ request: Request) throws -> Future<NavigatorRouteInfo> {
+        return try loadConfigsHandler(request).map(to: NavigatorRouteInfo.self) { storages in
             let navigator = Navigator(storages: storages)
             
-            let query = try request.query.decode(RouteQuery.self)
+            let query = try request.query.decode(NavigatorCreateRouteQuery.self)
             let source = query.source ?? navigator.randomStorage()
             let destination = query.destination ?? navigator.randomStorage(notEqual: source)
             
             guard let storages = navigator.shortestPath(source: source, destination: destination) else { throw Abort(.badRequest) }
             
-            let routeInfo = RouteInfo(storages: storages)
+            let routeInfo = NavigatorRouteInfo(storages: storages)
             return routeInfo
         }
     }
