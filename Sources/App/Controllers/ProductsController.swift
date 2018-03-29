@@ -19,6 +19,10 @@ extension ProductsController {
             }
         }
     }
+    
+    func getAllHandler(_ request: Request) throws -> Future<[Product]> {
+        return Product.query(on: request).all()
+    }
 }
 
 
@@ -29,5 +33,6 @@ extension ProductsController: RouteCollection {
     func boot(router: Router) throws {
         let productsController = router.grouped("products")
         productsController.get("new", use: createProductHandler)
+        productsController.get(use: getAllHandler)
     }
 }
