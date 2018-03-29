@@ -30,6 +30,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     services.register(databases)
     
     // Configure migrations
-    let migrations = MigrationConfig()
+    var migrations = MigrationConfig()
+    migrations.add(model: Product.self, database: .sqlite)
     services.register(migrations)
 }

@@ -9,4 +9,8 @@ public func routes(_ router: Router) throws {
     // Navigator
     let navigatorController = NavigatorController()
     try router.register(collection: navigatorController)
+    
+    // Products
+    let productsController = ProductsController()
+    try router.register(collection: productsController)
 }
