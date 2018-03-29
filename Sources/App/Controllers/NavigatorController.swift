@@ -17,8 +17,8 @@ extension NavigatorController {
     }
     
     func createRouteHandler(_ request: Request) throws -> Future<NavigatorRouteInfo> {
-        return try loadConfigsHandler(request).map(to: NavigatorRouteInfo.self) { storages in
-            let navigator = Navigator(storages: storages)
+        return try loadConfigsHandler(request).map(to: NavigatorRouteInfo.self) { storagesConfiguration in
+            let navigator = Navigator(storagesConfiguration: storagesConfiguration)
             
             let query = try request.query.decode(NavigatorCreateRouteQuery.self)
             let source = query.source ?? navigator.randomStorage()

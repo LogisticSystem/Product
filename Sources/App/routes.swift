@@ -13,4 +13,8 @@ public func routes(_ router: Router) throws {
     // Products
     let productsController = ProductsController()
     try router.register(collection: productsController)
+    
+    // Storages
+    let storagesController = StoragesController()
+    try router.register(collection: storagesController)
 }

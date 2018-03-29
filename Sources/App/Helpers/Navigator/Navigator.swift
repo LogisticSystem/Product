@@ -14,14 +14,14 @@ final class Navigator {
     
     private let nodes: [String : StorageNode]
     
-    init(storages: StoragesConfiguration) {
+    init(storagesConfiguration: StoragesConfiguration) {
         var nodes: [String : StorageNode] = [:]
-        for storage in storages.storages {
+        for storage in storagesConfiguration.storages {
             let storageNode = StorageNode(name: storage)
             nodes[storage] = storageNode
         }
         
-        for storageInfo in storages.info {
+        for storageInfo in storagesConfiguration.info {
             guard let storage = nodes[storageInfo.name] else { continue }
             for connection in storageInfo.connections {
                 guard let node = nodes[connection.name] else { continue }
