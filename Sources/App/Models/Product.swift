@@ -1,34 +1,22 @@
 import Foundation
-import FluentSQLite
 import Vapor
 
 final class Product: Codable {
     
-    var id: UUID?
+    var id: String
     var source: String
     var destination: String
-    var route: String
+    var route: [String]
     var ownerId: String?
     
-    init(source: String, destination: String, route: String, ownerId: String?) {
+    init(id: String = UUID().uuidString, source: String, destination: String, route: [String], ownerId: String?) {
+        self.id = id
         self.source = source
         self.destination = destination
         self.route = route
         self.ownerId = ownerId
     }
 }
-
-
-// MARK: - SQLiteUUIDModel
-
-extension Product: SQLiteUUIDModel {
-    static let idKey: IDKey = \Product.id
-}
-
-
-// MARK: - Migration
-
-extension Product: Migration { }
 
 
 // MARK: - Content
