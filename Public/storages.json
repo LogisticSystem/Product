@@ -1,0 +1,51 @@
+{
+  "storages": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "info": [
+    {
+      "name": "A",
+      "connections": [
+        {
+          "name": "B",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "connections": [
+        {
+          "name": "C",
+          "weight": 3
+        },
+        {
+          "name": "D",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "name": "C",
+      "connections": [
+        {
+          "name": "D",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "D",
+      "connections": [
+        {
+          "name": "E",
+          "weight": 5
+        }
+      ]
+    }
+  ]
+}
