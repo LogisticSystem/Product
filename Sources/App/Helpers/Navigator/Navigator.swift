@@ -1,5 +1,3 @@
-import Foundation
-
 final private class StorageNode: Node {
     
     // MARK: - Публичные свойства
@@ -27,10 +25,6 @@ final class Navigator {
     // MARK: - Инициализация
     
     init(storagesConfiguration: StoragesConfiguration) {
-        #if os(Linux)
-            srandom(UInt32(time(nil)))
-        #endif
-        
         var nodes: [String : StorageNode] = [:]
         for storage in storagesConfiguration.storages {
             let storageNode = StorageNode(name: storage)
@@ -62,7 +56,7 @@ extension Navigator {
         
         var random: String = ""
         repeat {
-            let index = generateRandom(max: keys.count)
+            let index = Random.roll(max: keys.count)
             random = keys[index]
         } while(storage == random)
         
@@ -98,20 +92,4 @@ extension Navigator {
         let routeInfo = NavigatorRouteInfo(source: source, destination: destination, storages: storagesInfo)
         return routeInfo
     }
-}
-
-
-// MARK: - Приватные методы
-
-private extension Navigator {
-    
-    /// Генерация случайного числа
-    func generateRandom(max: Int) -> Int {
-        #if os(Linux)
-            return Int(random() % max)
-        #else
-            return Int(arc4random_uniform(UInt32(max)))
-        #endif
-    }
-    
 }
