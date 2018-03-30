@@ -1,6 +1,10 @@
 import Vapor
 
-struct ProductsController { }
+struct ProductsController {
+    
+    private let routeGeneratorUrl = "http://localhost:8080/navigator/route"
+    private let storagesUrl = "http://localhost:8080/storages"
+}
 
 
 // MARK: - Public methods
@@ -18,7 +22,7 @@ extension ProductsController {
     }
     
     func createProductHandler(_ request: Request) throws -> Future<Product> {
-        var urlComponents = URLComponents(string: "http://localhost:8080/navigator/route")
+        var urlComponents = URLComponents(string: self.routeGeneratorUrl)
         
         let query = try request.query.decode(ProductsCreateProductQuery.self)
         var queryItems: [URLQueryItem] = []
@@ -44,7 +48,7 @@ extension ProductsController {
                 let productsService = try request.make(ProductsService.self)
                 productsService.add(product)
                 
-                var urlComponents = URLComponents(string: "http://localhost:8080/storages")
+                var urlComponents = URLComponents(string: self.storagesUrl)
                 
                 urlComponents?.path += "/" + source + "/products"
                 
