@@ -15,6 +15,10 @@ final class Navigator {
     private let nodes: [String : StorageNode]
     
     init(storagesConfiguration: StoragesConfiguration) {
+        #if os(Linux)
+            srandom(UInt32(time(nil)))
+        #endif
+        
         var nodes: [String : StorageNode] = [:]
         for storage in storagesConfiguration.storages {
             let storageNode = StorageNode(name: storage)
@@ -45,7 +49,7 @@ extension Navigator {
         
         var random: String = ""
         repeat {
-            let index = Int(arc4random_uniform(UInt32(keys.count)))
+            let index = generateRandom(max: keys.count)
             random = keys[index]
         } while(storage == random)
         
@@ -60,4 +64,19 @@ extension Navigator {
         let result = path.array.reversed().compactMap { $0 as? StorageNode }.map { $0.name }
         return result
     }
+}
+
+
+// MARK: - Private methods
+
+private extension Navigator {
+    
+    func generateRandom(max: Int) -> Int {
+        #if os(Linux)
+            return Int(random() % max)
+        #else
+            return Int(arc4random_uniform(UInt32(max)))
+        #endif
+    }
+    
 }
