@@ -2,7 +2,13 @@ import Foundation
 
 final private class StorageNode: Node {
     
+    // MARK: - Публичные свойства
+    
+    /// Название склада
     let name: String
+    
+    
+    // MARK: - Инициализация
     
     init(name: String) {
         self.name = name
@@ -12,7 +18,13 @@ final private class StorageNode: Node {
 
 final class Navigator {
     
+    // MARK: - Приватные свойства
+    
+    /// Узлы
     private let nodes: [String : StorageNode]
+    
+    
+    // MARK: - Инициализация
     
     init(storagesConfiguration: StoragesConfiguration) {
         #if os(Linux)
@@ -40,10 +52,11 @@ final class Navigator {
 }
 
 
-// MARK: - Public methods
+// MARK: - Публичные методы
 
 extension Navigator {
     
+    /// Получение случайного склада
     func randomStorage(notEqual storage: String? = nil) -> String {
         let keys = Array(self.nodes.keys)
         
@@ -56,6 +69,7 @@ extension Navigator {
         return random
     }
     
+    /// Получение пути от точки до точки
     func shortestPath(source: String, destination: String) -> NavigatorRouteInfo? {
         guard let sourceNode = self.nodes[source] else { return nil }
         guard let destinationNode = self.nodes[destination] else { return nil }
@@ -87,10 +101,11 @@ extension Navigator {
 }
 
 
-// MARK: - Private methods
+// MARK: - Приватные методы
 
 private extension Navigator {
     
+    /// Генерация случайного числа
     func generateRandom(max: Int) -> Int {
         #if os(Linux)
             return Int(random() % max)

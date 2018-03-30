@@ -2,15 +2,18 @@ import Vapor
 
 struct StoragesController {
     
+    /// Настройки
     private let configsUrl = "http://localhost:8080/storages.json"
-    private let productsOwnerUrl = "http://localhost:8080/products/owner"
+    /// Модуль "Товар"
+    private let productsUrl = "http://localhost:8080/products"
 }
 
 
-// MARK: - Public methods
+// MARK: - Публичные методы
 
 extension StoragesController {
     
+    /// Настройка
     func configureHandler(_ request: Request) throws -> Future<[Storage]> {
         return try request.make(Client.self).get(self.configsUrl).flatMap(to: [Storage].self) { response in
             return try response.content.decode(StoragesConfiguration.self).map(to: [Storage].self) { storagesConfiguration in
@@ -22,22 +25,29 @@ extension StoragesController {
         }
     }
     
+    /// Получение списка складов
     func getAllHandler(_ request: Request) throws -> [Storage] {
         let storagesService = try request.make(StoragesService.self)
         return storagesService.getAll()
     }
     
+    /// Получение товаров
     func recieveProductsHandler(_ request: Request) throws -> Future<HTTPStatus> {
         return try request.content.decode(RecievedProducts.self).flatMap(to: HTTPStatus.self) { recievedProducts in
-            var urlComponents = URLComponents(string: self.productsOwnerUrl)
+            
+            // Формирование запроса на обновление владельца товаров
+            var urlComponents = URLComponents(string: self.productsUrl + "/owner")
             
             let storageId = try request.parameter(String.self)
-            urlComponents?.path += "/" + "storage-" + storageId
+            urlComponents?.path += "/storage-\(storageId)"
             
             guard let url = urlComponents?.string else { throw Abort(.badRequest) }
             recievedProducts.products.forEach { $0.route.removeFirst() }
             
+            // Отправка запроса на обновление владельца товаров
             return try self.updateOwner(request, url: url, products: recievedProducts.products).map(to: HTTPStatus.self) { updatedProducts in
+                
+                // Сохранение товаров в склад
                 let storagesService = try request.make(StoragesService.self)
                 
                 let products = updatedProducts.filter { !$0.route.isEmpty }
@@ -48,26 +58,39 @@ extension StoragesController {
         }
     }
     
+    /// Отправка товаров
     func prepareProductsHandler(_ request: Request) throws -> Future<StoragePrepareProductsResponse> {
         if request.http.mediaType == .json {
+            
+            // Извелечение данных из тела запроса
             return try request.content.decode(StoragePrepareProductsRequest.self).flatMap(to: StoragePrepareProductsResponse.self) { prepareProductsRequest in
+                
+                // Подготовка товаров к отправке
                 let storageId = try request.parameter(String.self)
                 
                 let storagesService = try request.make(StoragesService.self)
                 let products = storagesService.getProducts(from: storageId, to: prepareProductsRequest.accessiblePoints, count: prepareProductsRequest.capacity)
                 
-                return try self.updateOwner(request, url: self.productsOwnerUrl, products: products).map(to: StoragePrepareProductsResponse.self) { products in
+                // Отправка запроса на обновление владельца товаров
+                return try self.updateOwner(request, url: self.productsUrl + "/owner", products: products).map(to: StoragePrepareProductsResponse.self) { products in
+                    
+                    // Отправка товаров
                     let prepareProductsResponse = StoragePrepareProductsResponse(products: products)
                     return prepareProductsResponse
                 }
             }
         } else {
+            
+            // Подготовка товаров к отправке
             let storageId = try request.parameter(String.self)
             
             let storagesService = try request.make(StoragesService.self)
             let products = storagesService.getProducts(from: storageId)
             
-            return try updateOwner(request, url: self.productsOwnerUrl, products: products).map(to: StoragePrepareProductsResponse.self) { products in
+            // Отправка запроса на обновление владельца товаров
+            return try updateOwner(request, url: self.productsUrl + "/owner", products: products).map(to: StoragePrepareProductsResponse.self) { products in
+                
+                // Отправка товаров
                 let prepareProductsResponse = StoragePrepareProductsResponse(products: products)
                 return prepareProductsResponse
             }
@@ -76,10 +99,11 @@ extension StoragesController {
 }
 
 
-// MARK: - Private methods
+// MARK: - Приватные методы
 
 private extension StoragesController {
     
+    /// Изменить владельца для группы товаров
     func updateOwner(_ request: Request, url: String, products: [StorageProduct]) throws -> Future<[StorageProduct]> {
         let content = StorageProductsUpdateOwnerContainer(products: products)
         return try request.make(Client.self).put(url, content: content).flatMap(to: [StorageProduct].self) { response in

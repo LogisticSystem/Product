@@ -2,20 +2,25 @@ import Vapor
 
 struct NavigatorController {
     
+    // MARK: - Приватные свойства
+    
+    /// Настройки
     private let storagesUrl = "http://localhost:8080/storages.json"
 }
 
 
-// MARK: - Public methods
+// MARK: - Публичные методы
 
 extension NavigatorController {
     
+    /// Загрузка настроек
     func loadConfigsHandler(_ request: Request) throws -> Future<StoragesConfiguration> {
         return try request.make(Client.self).get(self.storagesUrl).flatMap(to: StoragesConfiguration.self) { response in
             return try response.content.decode(StoragesConfiguration.self)
         }
     }
     
+    /// Создание маршрута
     func createRouteHandler(_ request: Request) throws -> Future<NavigatorRouteInfo> {
         return try loadConfigsHandler(request).map(to: NavigatorRouteInfo.self) { storagesConfiguration in
             let navigator = Navigator(storagesConfiguration: storagesConfiguration)

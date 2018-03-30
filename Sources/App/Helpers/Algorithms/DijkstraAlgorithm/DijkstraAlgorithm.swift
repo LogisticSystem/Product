@@ -1,5 +1,6 @@
 final class DijkstraAlgorithm {
     
+    /// Получение кратчайшего пути
     static func shortestPath(source: Node, destination: Node) -> Path? {
         var frontier: [Path] = [] {
             didSet {

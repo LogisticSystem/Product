@@ -2,14 +2,18 @@ import Vapor
 
 final class StoragesService {
     
+    // MARK: - Приватные свойства
+    
+    /// Склады
     private var storages = SynchronizedValue([Storage]())
 }
 
 
-// MARK: - Public methods
+// MARK: - Публичные методы
 
 extension StoragesService {
     
+    /// Настройка
     func configure(with storagesConfiguration: StoragesConfiguration) -> [Storage] {
         let storages = storagesConfiguration.storages.map { Storage(id: $0, products: []) }
         self.storages.syncSet { tmpStorages in
@@ -19,10 +23,12 @@ extension StoragesService {
         return storages
     }
     
+    /// Получение всех складов
     func getAll() -> [Storage] {
         return self.storages.get()
     }
     
+    /// Добавить товары в склад
     func put(_ products: [StorageProduct], inStorage storageId: String) {
         self.storages.syncSet { storages in
             guard let storageIndex = storages.index(where: { $0.id == storageId }) else { return }
@@ -30,6 +36,7 @@ extension StoragesService {
         }
     }
     
+    /// Получение товаров для отправки
     func getProducts(from storageId: String, to storagesIds: [String]? = nil, count: Int? = nil) -> [StorageProduct] {
         var products: [StorageProduct] = []
         self.storages.syncSet { storages in

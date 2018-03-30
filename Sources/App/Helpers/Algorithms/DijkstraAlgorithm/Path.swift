@@ -1,8 +1,13 @@
 class Path {
     
+    // MARK: - Публичные свойства
+    
     let cumulativeWeight: Int
     let node: Node
     let previousPath: Path?
+    
+    
+    // MARK: - Инициализация
     
     init(to node: Node, via connection: Connection? = nil, previousPath path: Path? = nil) {
         if let path = path, let connection = connection {

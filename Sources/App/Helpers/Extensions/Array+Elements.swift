@@ -5,5 +5,4 @@ extension Array {
         guard count < self.count else { return self }
         return Array(self[..<count])
     }
-    
 }

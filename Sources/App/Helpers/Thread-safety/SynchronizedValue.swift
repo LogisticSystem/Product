@@ -18,7 +18,6 @@ final class SynchronizedValue<ValueType : Any> {
         self.accessQueue = DispatchQueue(label: label, attributes: .concurrent)
         self.backingValue = value
     }
-    
 }
 
 
@@ -45,7 +44,6 @@ extension SynchronizedValue {
             self.backingValue = newValue
         }
     }
-    
 }
 
 
@@ -91,5 +89,4 @@ extension SynchronizedValue {
     func setUnsafeValue(_ closure: (inout ValueType) -> ()) {
         closure(&self.backingValue)
     }
-    
 }
