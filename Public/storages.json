@@ -4,7 +4,26 @@
     "B",
     "C",
     "D",
-    "E"
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X"
   ],
   "info": [
     {
@@ -12,7 +31,7 @@
       "connections": [
         {
           "name": "B",
-          "weight": 4
+          "weight": 5
         }
       ]
     },
@@ -20,12 +39,16 @@
       "name": "B",
       "connections": [
         {
-          "name": "C",
-          "weight": 3
+          "name": "A",
+          "weight": 5
         },
         {
-          "name": "D",
-          "weight": 2
+          "name": "C",
+          "weight": 5
+        },
+        {
+          "name": "H",
+          "weight": 5
         }
       ]
     },
@@ -33,8 +56,12 @@
       "name": "C",
       "connections": [
         {
+          "name": "B",
+          "weight": 5
+        },
+        {
           "name": "D",
-          "weight": 1
+          "weight": 5
         }
       ]
     },
@@ -42,7 +69,355 @@
       "name": "D",
       "connections": [
         {
+          "name": "C",
+          "weight": 5
+        },
+        {
           "name": "E",
+          "weight": 3
+        },
+        {
+          "name": "I",
+          "weight": 3
+        },
+        {
+          "name": "J",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "E",
+      "connections": [
+        {
+          "name": "D",
+          "weight": 3
+        },
+        {
+          "name": "F",
+          "weight": 5
+        },
+        {
+          "name": "L",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "name": "F",
+      "connections": [
+        {
+          "name": "E",
+          "weight": 5
+        },
+        {
+          "name": "L",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "G",
+      "connections": [
+        {
+          "name": "H",
+          "weight": 1
+        },
+        {
+          "name": "M",
+          "weight": 1
+        },
+        {
+          "name": "N",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "H",
+      "connections": [
+        {
+          "name": "B",
+          "weight": 5
+        },
+        {
+          "name": "G",
+          "weight": 1
+        },
+        {
+          "name": "M",
+          "weight": 1
+        },
+        {
+          "name": "N",
+          "weight": 1
+        },
+        {
+          "name": "O",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "I",
+      "connections": [
+        {
+          "name": "D",
+          "weight": 3
+        },
+        {
+          "name": "V",
+          "weight": 10
+        }
+      ]
+    },
+    {
+      "name": "J",
+      "connections": [
+        {
+          "name": "D",
+          "weight": 4
+        },
+        {
+          "name": "K",
+          "weight": 1
+        },
+        {
+          "name": "P",
+          "weight": 1
+        },
+        {
+          "name": "Q",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "K",
+      "connections": [
+        {
+          "name": "J",
+          "weight": 1
+        },
+        {
+          "name": "P",
+          "weight": 1
+        },
+        {
+          "name": "Q",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "L",
+      "connections": [
+        {
+          "name": "E",
+          "weight": 3
+        },
+        {
+          "name": "F",
+          "weight": 5
+        },
+        {
+          "name": "R",
+          "weight": 5
+        },
+        {
+          "name": "W",
+          "weight": 10
+        }
+      ]
+    },
+    {
+      "name": "M",
+      "connections": [
+        {
+          "name": "G",
+          "weight": 1
+        },
+        {
+          "name": "H",
+          "weight": 1
+        },
+        {
+          "name": "N",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "N",
+      "connections": [
+        {
+          "name": "G",
+          "weight": 1
+        },
+        {
+          "name": "H",
+          "weight": 1
+        },
+        {
+          "name": "M",
+          "weight": 1
+        },
+        {
+          "name": "O",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "O",
+      "connections": [
+        {
+          "name": "H",
+          "weight": 5
+        },
+        {
+          "name": "N",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "P",
+      "connections": [
+        {
+          "name": "J",
+          "weight": 1
+        },
+        {
+          "name": "K",
+          "weight": 1
+        },
+        {
+          "name": "Q",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "Q",
+      "connections": [
+        {
+          "name": "J",
+          "weight": 1
+        },
+        {
+          "name": "K",
+          "weight": 1
+        },
+        {
+          "name": "P",
+          "weight": 1
+        },
+        {
+          "name": "W",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "name": "R",
+      "connections": [
+        {
+          "name": "L",
+          "weight": 5
+        },
+        {
+          "name": "X",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "S",
+      "connections": [
+        {
+          "name": "N",
+          "weight": 5
+        },
+        {
+          "name": "T",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "T",
+      "connections": [
+        {
+          "name": "S",
+          "weight": 5
+        },
+        {
+          "name": "U",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "U",
+      "connections": [
+        {
+          "name": "T",
+          "weight": 5
+        },
+        {
+          "name": "V",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "V",
+      "connections": [
+        {
+          "name": "U",
+          "weight": 5
+        },
+        {
+          "name": "I",
+          "weight": 10
+        },
+        {
+          "name": "W",
+          "weight": 3
+        }
+      ]
+    },
+    {
+      "name": "W",
+      "connections": [
+        {
+          "name": "L",
+          "weight": 10
+        },
+        {
+          "name": "Q",
+          "weight": 4
+        },
+        {
+          "name": "V",
+          "weight": 3
+        },
+        {
+          "name": "X",
+          "weight": 5
+        }
+      ]
+    },
+    {
+      "name": "X",
+      "connections": [
+        {
+          "name": "R",
+          "weight": 5
+        },
+        {
+          "name": "W",
           "weight": 5
         }
       ]
