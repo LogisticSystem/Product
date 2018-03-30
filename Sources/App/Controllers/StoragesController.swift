@@ -29,14 +29,14 @@ extension StoragesController {
     
     func recieveProductsHandler(_ request: Request) throws -> Future<HTTPStatus> {
         return try request.content.decode(RecievedProducts.self).flatMap(to: HTTPStatus.self) { recievedProducts in
-            recievedProducts.products.forEach { $0.route.removeFirst() }
-            
             var urlComponents = URLComponents(string: self.productsOwnerUrl)
             
             let storageId = try request.parameter(String.self)
             urlComponents?.path += "/" + "storage-" + storageId
             
             guard let url = urlComponents?.string else { throw Abort(.badRequest) }
+            recievedProducts.products.forEach { $0.route.removeFirst() }
+            
             return try self.updateOwner(request, url: url, products: recievedProducts.products).map(to: HTTPStatus.self) { updatedProducts in
                 let storagesService = try request.make(StoragesService.self)
                 
@@ -65,7 +65,7 @@ extension StoragesController {
             let storageId = try request.parameter(String.self)
             
             let storagesService = try request.make(StoragesService.self)
-            let products = storagesService.getProducts(from: storageId, to: nil, count: nil)
+            let products = storagesService.getProducts(from: storageId)
             
             return try updateOwner(request, url: self.productsOwnerUrl, products: products).map(to: StoragePrepareProductsResponse.self) { products in
                 let prepareProductsResponse = StoragePrepareProductsResponse(products: products)

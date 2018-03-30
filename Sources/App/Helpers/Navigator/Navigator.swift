@@ -56,13 +56,33 @@ extension Navigator {
         return random
     }
     
-    func shortestPath(source: String, destination: String) -> [String]? {
+    func shortestPath(source: String, destination: String) -> NavigatorRouteInfo? {
         guard let sourceNode = self.nodes[source] else { return nil }
         guard let destinationNode = self.nodes[destination] else { return nil }
         guard let path = DijkstraAlgorithm.shortestPath(source: sourceNode, destination: destinationNode) else { return nil }
         
-        let result = path.array.reversed().compactMap { $0 as? StorageNode }.map { $0.name }
-        return result
+        let storages = path.array.reversed().compactMap { $0 as? StorageNode }
+        guard let source = storages.first?.name, let destination = storages.last?.name else { return nil }
+        
+        var storagesInfo: [String] = []
+        for (index, storage) in storages.enumerated() {
+            guard index != 0 else {
+                storagesInfo.append("\(storage.name)|0")
+                continue
+            }
+            
+            let previousStorage = storages[index - 1]
+            guard let connectedStorageIndex = previousStorage.connections.index(where: { connection in
+                guard let storageNode = connection.to as? StorageNode else { return false }
+                return storageNode.name == storage.name
+            }) else { continue }
+            
+            let weight = previousStorage.connections[connectedStorageIndex].weight
+            storagesInfo.append("\(storage.name)|\(weight)")
+        }
+        
+        let routeInfo = NavigatorRouteInfo(source: source, destination: destination, storages: storagesInfo)
+        return routeInfo
     }
 }
 

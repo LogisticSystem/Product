@@ -2,7 +2,9 @@ final class DijkstraAlgorithm {
     
     static func shortestPath(source: Node, destination: Node) -> Path? {
         var frontier: [Path] = [] {
-            didSet { frontier.sort { return $0.cumulativeWeight < $1.cumulativeWeight } } // the frontier has to be always ordered
+            didSet {
+                frontier.sort { return $0.cumulativeWeight < $1.cumulativeWeight } // the frontier has to be always ordered
+            }
         }
         
         frontier.append(Path(to: source)) // the frontier is made by a path that starts nowhere and ends in the source

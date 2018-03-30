@@ -5,8 +5,8 @@ class Path {
     let previousPath: Path?
     
     init(to node: Node, via connection: Connection? = nil, previousPath path: Path? = nil) {
-        if let previousPath = path, let viaConnection = connection {
-            self.cumulativeWeight = viaConnection.weight + previousPath.cumulativeWeight
+        if let path = path, let connection = connection {
+            self.cumulativeWeight = connection.weight + path.cumulativeWeight
         } else {
             self.cumulativeWeight = 0
         }
@@ -19,7 +19,7 @@ class Path {
 extension Path {
     
     var array: [Node] {
-        var array: [Node] = [self.node]
+        var array = [self.node]
         
         var iterativePath = self
         while let path = iterativePath.previousPath {

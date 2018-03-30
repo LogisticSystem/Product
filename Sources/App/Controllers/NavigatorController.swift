@@ -24,9 +24,7 @@ extension NavigatorController {
             let source = query.source ?? navigator.randomStorage()
             let destination = query.destination ?? navigator.randomStorage(notEqual: source)
             
-            guard let storages = navigator.shortestPath(source: source, destination: destination) else { throw Abort(.badRequest) }
-            
-            let routeInfo = NavigatorRouteInfo(storages: storages)
+            guard let routeInfo = navigator.shortestPath(source: source, destination: destination) else { throw Abort(.badRequest) }
             return routeInfo
         }
     }
