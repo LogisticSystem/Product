@@ -1,4 +1,4 @@
-final private class StorageNode: Node {
+private final class StorageNode: Node {
     
     // MARK: - Публичные свойства
     
