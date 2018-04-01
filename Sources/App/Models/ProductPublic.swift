@@ -1,7 +1,6 @@
-import Foundation
 import Vapor
 
-final class Product: Codable {
+final class ProductPublic: Codable {
     
     // MARK: - Публичные свойства
     
@@ -13,33 +12,30 @@ final class Product: Codable {
     var destination: String
     /// Маршрут
     var route: [String]
-    /// Идентификатор владельца
-    var ownerId: String?
     
     
     // MARK: - Инициализация
     
-    init(id: String = UUID().uuidString, source: String, destination: String, route: [String], ownerId: String?) {
+    init(id: String, source: String, destination: String, route: [String]) {
         self.id = id
         self.source = source
         self.destination = destination
         self.route = route
-        self.ownerId = ownerId
     }
 }
 
 
 // MARK: - Публичные свойства
 
-extension Product {
+extension ProductPublic {
     
     /// Товар
-    var productPublic: ProductPublic {
-        return ProductPublic(id: self.id, source: self.source, destination: self.destination, route: self.route)
+    var productPrivate: Product {
+        return Product(id: self.id, source: self.source, destination: self.destination, route: self.route, ownerId: nil)
     }
 }
 
 
 // MARK: - Content
 
-extension Product: Content { }
+extension ProductPublic: Content { }

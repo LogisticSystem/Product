@@ -28,7 +28,7 @@ extension ProductsController {
     }
     
     /// Создание товара
-    func createProductHandler(_ request: Request) throws -> Future<Product> {
+    func createProductHandler(_ request: Request) throws -> Future<ProductPublic> {
         
         // Формирование запроса на создание маршрута
         var urlComponents = URLComponents(string: self.navigatorUrl + "/route")
@@ -48,15 +48,15 @@ extension ProductsController {
         guard let url = urlComponents?.string else { throw Abort(.badRequest) }
         
         // Отправка запроса на создание маршрута
-        return try request.make(Client.self).get(url).flatMap(to: Product.self) { response in
-            return try response.content.decode(NavigatorRouteInfo.self).flatMap(to: Product.self) { routeInfo in
+        return try request.make(Client.self).get(url).flatMap(to: ProductPublic.self) { response in
+            return try response.content.decode(NavigatorRouteInfo.self).flatMap(to: ProductPublic.self) { routeInfo in
                 
                 // Создание товара
-                let product = Product(source: routeInfo.source, destination: routeInfo.destination, route: routeInfo.storages, ownerId: nil)
+                let privateProduct = Product(source: routeInfo.source, destination: routeInfo.destination, route: routeInfo.storages, ownerId: nil)
                 
                 // Сохранение товара
                 let productsService = try request.make(ProductsService.self)
-                productsService.add(product)
+                productsService.add(privateProduct)
                 
                 // Формирование запроса на отправку товара складу
                 var urlComponents = URLComponents(string: self.storagesUrl)
@@ -65,9 +65,10 @@ extension ProductsController {
                 guard let url = urlComponents?.string else { throw Abort(.badRequest) }
                 
                 // Отправка товара складу
-                let content = MultipleProducts(products: [product])
-                return try request.make(Client.self).post(url, content: content).map(to: Product.self) { response in
-                    return product
+                let productPublic = privateProduct.productPublic
+                let content = MultipleProducts(products: [productPublic])
+                return try request.make(Client.self).post(url, content: content).map(to: ProductPublic.self) { response in
+                    return productPublic
                 }
             }
         }
@@ -79,9 +80,10 @@ extension ProductsController {
             let ownerId = try request.parameter(String.self)
             
             let productsService = try request.make(ProductsService.self)
-            let products = productsService.changeOwner(ownerId, forProducts: multipleProducts.products)
+            let privateProducts = multipleProducts.products.map { $0.productPrivate }
+            let publicProducts = productsService.changeOwner(ownerId, forProducts: privateProducts).map { $0.productPublic }
             
-            return MultipleProducts(products: products)
+            return MultipleProducts(products: publicProducts)
         }
     }
     
@@ -89,9 +91,10 @@ extension ProductsController {
     func multipleDeleteOwnerHandler(_ request: Request) throws -> Future<MultipleProducts> {
         return try request.content.decode(MultipleProducts.self).map(to: MultipleProducts.self) { multipleProducts in
             let productsService = try request.make(ProductsService.self)
-            let products = productsService.changeOwner(nil, forProducts: multipleProducts.products)
+            let privateProducts = multipleProducts.products.map { $0.productPrivate }
+            let publicProducts = productsService.changeOwner(nil, forProducts: privateProducts).map { $0.productPublic }
             
-            return MultipleProducts(products: products)
+            return MultipleProducts(products: publicProducts)
         }
     }
 }

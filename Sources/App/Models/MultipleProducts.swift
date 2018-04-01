@@ -5,12 +5,12 @@ final class MultipleProducts: Codable {
     // MARK: - Публичные свойства
     
     /// Товары
-    var products: [Product]
+    var products: [ProductPublic]
     
     
     // MARK: - Инициализация
     
-    init(products: [Product]) {
+    init(products: [ProductPublic]) {
         self.products = products
     }
 }
