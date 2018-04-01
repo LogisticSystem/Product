@@ -50,7 +50,7 @@ extension StoragesController {
                 // Сохранение товаров в склад
                 let storagesService = try request.make(StoragesService.self)
                 
-                let products = updatedProducts.filter { !$0.route.isEmpty }
+                let products = updatedProducts.filter { !($0.route.isEmpty || $0.destination == storageId) }
                 storagesService.put(products, inStorage: storageId)
                 
                 return .ok
