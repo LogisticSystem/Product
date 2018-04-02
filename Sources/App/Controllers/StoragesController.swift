@@ -47,11 +47,30 @@ extension StoragesController {
             // Отправка запроса на обновление владельца товаров
             return try self.updateOwner(request, url: url, products: recievedProducts.products).map(to: HTTPStatus.self) { updatedProducts in
                 
+                // Сортировка товаров
+                var deliveredProducts: [StorageProduct] = []
+                var recievedProducts: [StorageProduct] = []
+                
+                for product in updatedProducts {
+                    if product.route.isEmpty || product.destination == storageId {
+                        deliveredProducts.append(product)
+                    } else {
+                        recievedProducts.append(product)
+                    }
+                }
+                
                 // Сохранение товаров в склад
                 let storagesService = try request.make(StoragesService.self)
+                storagesService.put(recievedProducts, inStorage: storageId)
                 
-                let products = updatedProducts.filter { !($0.route.isEmpty || $0.destination == storageId) }
-                storagesService.put(products, inStorage: storageId)
+                // Логирование
+                let loggerService = try request.make(LoggerService.self)
+                if !deliveredProducts.isEmpty {
+                    loggerService.log("Storage \(storageId) did finish delivering products with ids: \(deliveredProducts.map { $0.id }.joined(separator: ", ")).")
+                }
+                if !recievedProducts.isEmpty {
+                    loggerService.log("Storage \(storageId) recieved products with ids: \(recievedProducts.map { $0.id }.joined(separator: ", ")).")
+                }
                 
                 return .ok
             }
@@ -74,6 +93,12 @@ extension StoragesController {
                 // Отправка запроса на обновление владельца товаров
                 return try self.updateOwner(request, url: self.productsUrl + "/owner", products: products).map(to: StoragePrepareProductsResponse.self) { products in
                     
+                    // Логирование
+                    if !products.isEmpty {
+                        let loggerService = try request.make(LoggerService.self)
+                        loggerService.log("Storage \(storageId) send products with ids: \(products.map { $0.id }.joined(separator: ", ")).")
+                    }
+                    
                     // Отправка товаров
                     let prepareProductsResponse = StoragePrepareProductsResponse(products: products)
                     return prepareProductsResponse
@@ -89,6 +114,12 @@ extension StoragesController {
             
             // Отправка запроса на обновление владельца товаров
             return try updateOwner(request, url: self.productsUrl + "/owner", products: products).map(to: StoragePrepareProductsResponse.self) { products in
+                
+                // Логирование
+                if !products.isEmpty {
+                    let loggerService = try request.make(LoggerService.self)
+                    loggerService.log("Storage \(storageId) send products with ids: \(products.map { $0.id }.joined(separator: ", ")).")
+                }
                 
                 // Отправка товаров
                 let prepareProductsResponse = StoragePrepareProductsResponse(products: products)

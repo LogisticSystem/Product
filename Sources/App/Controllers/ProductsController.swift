@@ -58,6 +58,10 @@ extension ProductsController {
                 let productsService = try request.make(ProductsService.self)
                 productsService.add(privateProduct)
                 
+                // Логирование
+                let loggerService = try request.make(LoggerService.self)
+                loggerService.log("Create product with id: \(privateProduct.id).")
+                
                 // Формирование запроса на отправку товара складу
                 var urlComponents = URLComponents(string: self.storagesUrl)
                 urlComponents?.path += "/\(routeInfo.source)/products"
@@ -77,11 +81,20 @@ extension ProductsController {
     /// Изменение владельца для товаров
     func multipleChangeOwnerHandler(_ request: Request) throws -> Future<MultipleProducts> {
         return try request.content.decode(MultipleProducts.self).map(to: MultipleProducts.self) { multipleProducts in
+            
+            // Получаем идентификатор нового владельца
             let ownerId = try request.parameter(String.self)
             
+            // Обновляем данные
             let productsService = try request.make(ProductsService.self)
             let privateProducts = multipleProducts.products.map { $0.productPrivate }
             let publicProducts = productsService.changeOwner(ownerId, forProducts: privateProducts).map { $0.productPublic }
+            
+            // Логирование
+            if !publicProducts.isEmpty {
+                let loggerService = try request.make(LoggerService.self)
+                loggerService.log("Set owner \(ownerId) for products with ids: \(publicProducts.map { $0.id }.joined(separator: ", ")).")
+            }
             
             return MultipleProducts(products: publicProducts)
         }
@@ -90,9 +103,17 @@ extension ProductsController {
     /// Удаление владельца для товаров
     func multipleDeleteOwnerHandler(_ request: Request) throws -> Future<MultipleProducts> {
         return try request.content.decode(MultipleProducts.self).map(to: MultipleProducts.self) { multipleProducts in
+            
+            // Обновляем данные
             let productsService = try request.make(ProductsService.self)
             let privateProducts = multipleProducts.products.map { $0.productPrivate }
             let publicProducts = productsService.changeOwner(nil, forProducts: privateProducts).map { $0.productPublic }
+            
+            // Логирование
+            if !publicProducts.isEmpty {
+                let loggerService = try request.make(LoggerService.self)
+                loggerService.log("Delete owners for products with ids: \(publicProducts.map { $0.id }.joined(separator: ", ")).")
+            }
             
             return MultipleProducts(products: publicProducts)
         }
