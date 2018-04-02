@@ -45,7 +45,7 @@ extension ProductsController {
         }
         
         urlComponents?.queryItems = queryItems.isEmpty ? nil : queryItems
-        guard let url = urlComponents?.string else { throw Abort(.badRequest) }
+        guard let url = urlComponents?.string else { throw Abort(.badRequest, reason: "URL cannot construct with the query \(query).") }
         
         // Отправка запроса на создание маршрута
         return try request.make(Client.self).get(url).flatMap(to: ProductPublic.self) { response in
@@ -62,7 +62,7 @@ extension ProductsController {
                 var urlComponents = URLComponents(string: self.storagesUrl)
                 urlComponents?.path += "/\(routeInfo.source)/products"
                 
-                guard let url = urlComponents?.string else { throw Abort(.badRequest) }
+                guard let url = urlComponents?.string else { throw Abort(.badRequest, reason: "URL cannot construct with the storage identifier \(routeInfo.source).") }
                 
                 // Отправка товара складу
                 let productPublic = privateProduct.productPublic

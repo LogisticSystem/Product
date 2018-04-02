@@ -41,7 +41,7 @@ extension StoragesController {
             let storageId = try request.parameter(String.self)
             urlComponents?.path += "/storage-\(storageId)"
             
-            guard let url = urlComponents?.string else { throw Abort(.badRequest) }
+            guard let url = urlComponents?.string else { throw Abort(.badRequest, reason: "URL cannot construct with the storage identifier \(storageId).") }
             recievedProducts.products.forEach { $0.route.removeFirst() }
             
             // Отправка запроса на обновление владельца товаров
