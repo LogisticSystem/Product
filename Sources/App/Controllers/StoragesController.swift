@@ -50,11 +50,11 @@ extension StoragesController {
             
             guard let url = urlComponents?.string else { throw Abort(.badRequest, reason: "URL cannot construct with the storage identifier \(storageId).") }
             recievedProducts.products.forEach { product in
-                while (!product.route.isEmpty && !product.route[0].hasPrefix(storageId)) {
+                if recievedProducts.transportId?.hasPrefix("car") ?? false {
+                    product.route.removeAll()
+                } else {
                     product.route.removeFirst()
                 }
-                
-                product.route.removeFirst()
             }
             
             // Отправка запроса на обновление владельца товаров
