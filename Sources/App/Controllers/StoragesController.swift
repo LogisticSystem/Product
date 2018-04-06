@@ -35,42 +35,55 @@ extension StoragesController {
     func recieveProductsHandler(_ request: Request) throws -> Future<HTTPStatus> {
         return try request.content.decode(RecievedProducts.self).flatMap(to: HTTPStatus.self) { recievedProducts in
             
+            // Параметры запроса
+            let storageId = try request.parameter(String.self)
+            
+            // Логирование
+            let loggerService = try request.make(LoggerService.self)
+            
+            let storagesMessage = StoragesMessage(action: "storagesWillRecieve|message|log", products: recievedProducts.products, storageId: storageId, transportId: recievedProducts.transportId)
+            try loggerService.log(storagesMessage)
+            
             // Формирование запроса на обновление владельца товаров
             var urlComponents = URLComponents(string: self.productsUrl + "/owner")
-            
-            let storageId = try request.parameter(String.self)
             urlComponents?.path += "/storage-\(storageId)"
             
             guard let url = urlComponents?.string else { throw Abort(.badRequest, reason: "URL cannot construct with the storage identifier \(storageId).") }
-            recievedProducts.products.forEach { $0.route.removeFirst() }
+            recievedProducts.products.forEach { product in
+                while (!product.route.isEmpty && !product.route[0].hasPrefix(storageId)) {
+                    product.route.removeFirst()
+                }
+                
+                product.route.removeFirst()
+            }
             
             // Отправка запроса на обновление владельца товаров
-            return try self.updateOwner(request, url: url, products: recievedProducts.products).map(to: HTTPStatus.self) { updatedProducts in
+            return try self.updateOwner(request, url: url, products: recievedProducts.products).map(to: HTTPStatus.self) { products in
                 
                 // Сортировка товаров
                 var deliveredProducts: [StorageProduct] = []
-                var products: [StorageProduct] = []
+                var newProducts: [StorageProduct] = []
                 
-                for product in updatedProducts {
+                for product in products {
                     if product.route.isEmpty || product.destination == storageId {
                         deliveredProducts.append(product)
                     } else {
-                        products.append(product)
+                        newProducts.append(product)
                     }
                 }
                 
                 // Сохранение товаров в склад
                 let storagesService = try request.make(StoragesService.self)
-                storagesService.put(products, inStorage: storageId)
+                storagesService.put(newProducts, inStorage: storageId)
                 
                 // Логирование
                 let loggerService = try request.make(LoggerService.self)
-                if !deliveredProducts.isEmpty, let transportId = recievedProducts.transportId {
-                    let storagesMessage = StoragesMessage(action: "storagesDidFinishDelivering|message|log", products: deliveredProducts, storageId: storageId, transportId: transportId)
-                    try loggerService.log(storagesMessage)
-                }
-                if !products.isEmpty, let transportId = recievedProducts.transportId {
-                    let storagesMessage = StoragesMessage(action: "storagesDidRecieve|message|log", products: deliveredProducts, storageId: storageId, transportId: transportId)
+                
+                let storagesMessage = StoragesMessage(action: "storagesDidRecieve|message|log", products: products, storageId: storageId, transportId: recievedProducts.transportId)
+                try loggerService.log(storagesMessage)
+                
+                if !deliveredProducts.isEmpty {
+                    let storagesMessage = StoragesMessage(action: "storagesDidFinishDelivering|message|log", products: deliveredProducts, storageId: storageId, transportId: recievedProducts.transportId)
                     try loggerService.log(storagesMessage)
                 }
                 
@@ -83,9 +96,16 @@ extension StoragesController {
     func prepareProductsHandler(_ request: Request) throws -> Future<StoragePrepareProductsResponse> {
         return try request.content.decode(StoragePrepareProductsRequest.self).flatMap(to: StoragePrepareProductsResponse.self) { prepareProductsRequest in
             
-            // Подготовка товаров к отправке
+            // Параметры запроса
             let storageId = try request.parameter(String.self)
             
+            // Логирование
+            let loggerService = try request.make(LoggerService.self)
+            
+            let storagesMessage = StoragesMessage(action: "storagesWillSend|message|log", products: [], storageId: storageId, transportId: prepareProductsRequest.transportId)
+            try loggerService.log(storagesMessage)
+            
+            // Подготовка товаров к отправке
             let storagesService = try request.make(StoragesService.self)
             let products = storagesService.getProducts(from: storageId, to: prepareProductsRequest.accessiblePoints, count: prepareProductsRequest.capacity)
             
@@ -93,12 +113,10 @@ extension StoragesController {
             return try self.updateOwner(request, url: self.productsUrl + "/owner", products: products).map(to: StoragePrepareProductsResponse.self) { products in
                 
                 // Логирование
-                if !products.isEmpty {
-                    let loggerService = try request.make(LoggerService.self)
-                    
-                    let storagesMessage = StoragesMessage(action: "storagesDidSend|message|log", products: products, storageId: storageId, transportId: prepareProductsRequest.transportId)
-                    try loggerService.log(storagesMessage)
-                }
+                let loggerService = try request.make(LoggerService.self)
+                
+                let storagesMessage = StoragesMessage(action: "storagesDidSend|message|log", products: products, storageId: storageId, transportId: prepareProductsRequest.transportId)
+                try loggerService.log(storagesMessage)
                 
                 // Отправка товаров
                 let prepareProductsResponse = StoragePrepareProductsResponse(products: products)

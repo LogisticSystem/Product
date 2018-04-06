@@ -11,12 +11,12 @@ final class StoragesMessage: Codable {
     /// Идентификатор склада
     var storageId: String
     /// Идентификатор транспорта
-    var transportId: String
+    var transportId: String?
     
     
     // MARK: - Инициализация
     
-    init(action: String, products: [StorageProduct], storageId: String, transportId: String) {
+    init(action: String, products: [StorageProduct], storageId: String, transportId: String?) {
         self.action = action
         self.products = products
         self.storageId = storageId
