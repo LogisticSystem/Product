@@ -41,7 +41,8 @@ extension StoragesController {
             // Логирование
             let loggerService = try request.make(LoggerService.self)
             
-            let storagesMessage = StoragesMessage(action: "storagesWillRecieve|message|log", products: recievedProducts.products, storageId: storageId, transportId: recievedProducts.transportId)
+            let action = recievedProducts.transportId == nil ? "storagesCreationalRecieve|message|log" : "storagesWillRecieve|message|log"
+            let storagesMessage = StoragesMessage(action: action, products: recievedProducts.products, storageId: storageId, transportId: recievedProducts.transportId)
             try loggerService.log(storagesMessage)
             
             // Формирование запроса на обновление владельца товаров
